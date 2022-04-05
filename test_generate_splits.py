@@ -3,7 +3,7 @@ import random
 import clover_utils.generate_splits as generate_splits
 
 def test_generate_10_random_splits():
-    fp_src = f"./clover_utils/sample_data/msl_initial_splits/train-set-v2.1.txt"
+    fp_src = f"./clover_utils/sample_data/msl/paper_provided_splits/train-set-v2.1.txt"
 
     # We want 10 different 'rolls'
     for i in range(10):
@@ -39,7 +39,7 @@ def test_generate_10_random_cumulative_splits():
         for j, pct in enumerate(pcts):
             # Where to find the previous X%-of-data regime file?
             if j == 0:
-                fp_prev = f"./clover_utils/sample_data/msl_initial_splits/train-set-v2.1.txt"
+                fp_prev = f"./clover_utils/sample_data/msl/paper_provided_splits/train-set-v2.1.txt"
             else:
                 fp_prev = f"./test_outputs/random-cumulative-split-{i}/{pcts[j-1]}pctTrain.txt"
 
