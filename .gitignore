@@ -1,5 +1,5 @@
 # Don't commit anything in test outputs
-test_outputs/*
+tests/outputs/*
 
 # Always keep the gitkeeps to preserve folder structure 
 !.gitkeep

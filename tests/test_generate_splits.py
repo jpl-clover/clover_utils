@@ -15,7 +15,7 @@ def test_generate_10_random_splits():
         for pct in [1,5,10,20,30,40,50,60,70,80,90]:
             filenames, labels = generate_splits.read_filenames_and_labels(fp_src)
             new_filenames, new_labels = generate_splits.resample_fraction_with_preserved_distribution(filenames, labels, fraction=pct/100)
-            generate_splits.write_filenames_and_labels(new_filenames, new_labels, f"./test_outputs/random-split-{i}/{pct}pctTrain.txt")
+            generate_splits.write_filenames_and_labels(new_filenames, new_labels, f"./tests/outputs/random-split-{i}/{pct}pctTrain.txt")
             print(f"{pct}%-of-data regime has {len(new_filenames)} samples")
 
 def test_generate_10_random_cumulative_splits():
@@ -41,7 +41,8 @@ def test_generate_10_random_cumulative_splits():
             if j == 0:
                 fp_prev = f"./clover_utils/sample_data/msl/paper_provided_splits/train-set-v2.1.txt"
             else:
-                fp_prev = f"./test_outputs/random-cumulative-split-{i}/{pcts[j-1]}pctTrain.txt"
+                fp_prev = f"./tests/outputs/random-cumulative-split-{i}/{pcts[j-1]}pctTrain.txt"
+            fp_curr = f"./tests/outputs/random-cumulative-split-{i}/{pct}pctTrain.txt"
 
             # Load the prev files
             filenames, labels = generate_splits.read_filenames_and_labels(fp_prev)
@@ -54,8 +55,18 @@ def test_generate_10_random_cumulative_splits():
                 new_filenames, new_labels = generate_splits.resample_fraction_with_preserved_distribution(filenames, labels, fraction=pct/pcts[j-1])
 
             # Write the new files
-            generate_splits.write_filenames_and_labels(new_filenames, new_labels, f"./test_outputs/random-cumulative-split-{i}/{pct}pctTrain.txt")
+            generate_splits.write_filenames_and_labels(new_filenames, new_labels, fp_curr)
             print(f"{pct}%-of-data regime has {len(new_filenames)} samples")
 
+            # Lets double check that the cumulative splits really are cumulative
+            all_contained = True
+            for new_filename in new_filenames:
+                all_contained = all_contained and (new_filename in filenames)
+            print(f"Are all of the {pct}%\-of-data regime items contained in the {pcts[j-1]}%\-of-data regime? {all_contained}")
+
+
+# TODO - check why the cumulative splits don't have the exact same amount as the regular random splits
+# I would guess that because we need to preserve the dsitribution and the cumulative constraint it isn't
+# always possible to select the right amount of files, hence why we're out +-10 per regime
 test_generate_10_random_splits()
 test_generate_10_random_cumulative_splits()
