@@ -10,6 +10,12 @@ setup(
     packages=['clover_utils'],
     install_requires=[
         'mpi4py>=2.0',
-        'numpy',                     
+        'numpy',     
+        'torchmetrics',
+        'matplotlib',
+        'timm',         
+        'wandb',
+        'pytorch_lightning',
+        'scikit-learn'       
     ]
 )
