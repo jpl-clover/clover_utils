@@ -1,8 +1,12 @@
+import math
 import os
 import random
-import math
-import numpy as np
+from collections import defaultdict
 from pathlib import Path
+
+import numpy as np
+
+repo_root = Path(os.path.realpath(__file__)).parent.parent
 
 def read_filenames_and_labels(fp_src):
     """
@@ -12,22 +16,40 @@ def read_filenames_and_labels(fp_src):
         lines = f.readlines()
     filenames = []
     labels = []
+    others = defaultdict(list)
     for line in lines:
-        tokens = line.split(" ")
+        tokens = line.strip().split(" ")
         filenames.append(tokens[0])
         labels.append(tokens[1])
-    return filenames, labels
+        for n, i in enumerate(range(2, len(tokens))):
+            others[n].append(tokens[i])
+    if len(others) > 0:
+        return filenames, labels, *[others[i] for i in range(len(others))]
+    else:
+        return filenames, labels
 
-def write_filenames_and_labels(filenames, labels, fn):
+
+def write_filenames_and_labels(filenames, labels, fn, *args):
     """
     Simple file writer utility
     """
     Path(os.path.dirname(fn)).mkdir(parents=True, exist_ok=True)
     with open(fn, "w") as f:
         for i in range(len(filenames)):
-            f.write(f"{filenames[i]} {labels[i]}")
+            if len(args) > 0:
+                suffix = "\t".join([str(args[j][i]) for j in range(len(args))]).strip()
+                f.write(f"{filenames[i]}\t{labels[i]}\t{suffix}\n")
+            else:
+                f.write(f"{filenames[i].strip()} {labels[i].strip()}\n")
 
-def resample_fraction_with_preserved_distribution(filenames, labels, fraction=1.0):
+
+def resample_fraction_with_preserved_distribution(
+    filenames, labels, fraction=1.0, seed=0
+):
+    # set random seed to ensure we get the same results every time
+    random.seed(seed)
+    np.random.seed(seed)
+
     n = math.floor(len(filenames) * fraction)
 
     # What is the initial label distribution
